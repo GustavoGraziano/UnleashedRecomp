@@ -54,6 +54,8 @@ static double g_lastIncrementTime;
 static bool g_upWasHeld;
 static bool g_downWasHeld;
 
+static bool portugues = false;
+
 static void ResetSelection()
 {
     g_firstVisibleRowIndex = 0;
@@ -405,7 +407,7 @@ static void DrawTrophySparkles(ImVec2 min, ImVec2 max, int recordCount, int trop
                 );
             }
         }
-        
+
         if (trophyFrameIndex >= 24 && trophyFrameIndex <= 29)
         {
             auto marginY = Scale(1);
@@ -744,6 +746,12 @@ void AchievementMenu::Draw()
 
 void AchievementMenu::Open()
 {
+    if (Config::Language == ELanguage::Portuguese)
+    {
+        portugues = true;
+        Config::Language = ELanguage::English;
+    }
+
     s_isVisible = true;
     g_isClosing = false;
     g_appearTime = ImGui::GetTime();
@@ -773,6 +781,12 @@ void AchievementMenu::Open()
 
 void AchievementMenu::Close()
 {
+    if (portugues == true)
+    {
+        Config::Language = ELanguage::Portuguese;
+        portugues = false;
+    }
+
     if (!g_isClosing)
     {
         g_appearTime = ImGui::GetTime();

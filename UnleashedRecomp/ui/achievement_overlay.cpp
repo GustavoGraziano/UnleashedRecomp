@@ -29,6 +29,8 @@ static Achievement g_achievement;
 
 static ImFont* g_fntSeurat;
 
+static bool portugues2 = false;
+
 static bool DrawContainer(ImVec2 min, ImVec2 max, float cornerRadius = 25)
 {
     auto drawList = ImGui::GetBackgroundDrawList();
@@ -123,10 +125,10 @@ void AchievementOverlay::Draw()
         g_appearTime = ImGui::GetTime();
         g_achievement = g_xdbfWrapper.GetAchievement((EXDBFLanguage)Config::Language.Value, s_queue.front());
         s_queue.pop();
-        
+
         if (Config::Language == ELanguage::English)
             g_achievement.Name = xdbf::FixInvalidSequences(g_achievement.Name);
-        
+
         Game_PlaySound("obj_navi_appear");
     }
 
@@ -135,7 +137,7 @@ void AchievementOverlay::Draw()
         g_soundAdministratorUpdated = false;
         return;
     }
-    
+
     if (ImGui::GetTime() - g_appearTime >= OVERLAY_DURATION)
         AchievementOverlay::Close();
 
@@ -227,11 +229,23 @@ void AchievementOverlay::Draw()
 
 void AchievementOverlay::Open(int id)
 {
+    if (Config::Language == ELanguage::Portuguese)
+    {
+        portugues2 = true;
+        Config::Language = ELanguage::English;
+    }
+
     s_queue.push(id);
 }
 
 void AchievementOverlay::Close()
 {
+    if (portugues2 == true)
+    {
+        Config::Language = ELanguage::Portuguese;
+        portugues2 = false;
+    }
+    
     if (!g_isClosing)
     {
         g_appearTime = ImGui::GetTime();
