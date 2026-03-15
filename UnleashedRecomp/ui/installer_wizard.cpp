@@ -385,6 +385,7 @@ const char* LANGUAGE_TEXT[] =
     "ESPAÑOL", // Spanish
     "ITALIANO", // Italian
     "日本語", // Japanese
+    "PORTUGUÊS", // Portuguese
 };
 
 const ELanguage LANGUAGE_ENUM[] =
@@ -395,6 +396,7 @@ const ELanguage LANGUAGE_ENUM[] =
     ELanguage::Spanish,
     ELanguage::Italian,
     ELanguage::Japanese,
+    ELanguage::Portuguese,
 };
 
 const char *DLC_SOURCE_TEXT[] =
@@ -418,12 +420,12 @@ static double ComputeMotionInstaller(double timeAppear, double timeDisappear, do
     return ComputeMotion(timeAppear, offset, total) * (1.0 - ComputeMotion(timeDisappear, ALL_ANIMATIONS_FULL_DURATION - offset - total, total));
 }
 
-static double ComputeMotionInstallerLoop(double timeAppear, double speed, double offset) 
+static double ComputeMotionInstallerLoop(double timeAppear, double speed, double offset)
 {
     return std::clamp(fmodf((ImGui::GetTime() - timeAppear) * speed, 1.0f + offset) - offset, 0.0, 1.0) / 1.0;
 }
 
-static double ComputeHermiteMotionInstallerLoop(double timeAppear, double speed, double offset) 
+static double ComputeHermiteMotionInstallerLoop(double timeAppear, double speed, double offset)
 {
     return (cosf(M_PI * ComputeMotionInstallerLoop(timeAppear, speed, offset) + M_PI) + 1) / 2;
 }
@@ -505,7 +507,7 @@ static void DrawHeaderIconsForInstallPhase(double iconsPosX, double iconsPosY, d
     // Calculate rotated corners
     float cosCurrentAngle = cosf(rotation);
     float sinCurrentAngle = sinf(rotation);
-    ImVec2 corners[4] = 
+    ImVec2 corners[4] =
     {
         ImRotate(ImVec2(arrowCircleMin.x - center.x, arrowCircleMin.y - center.y), cosCurrentAngle, sinCurrentAngle),
         ImRotate(ImVec2(arrowCircleMax.x - center.x, arrowCircleMin.y - center.y), cosCurrentAngle, sinCurrentAngle),
@@ -533,7 +535,7 @@ static void DrawHeaderIconsForInstallPhase(double iconsPosX, double iconsPosY, d
         // Calculate linear fade-out from high point time - ({PULSE_ANIMATION_LOOP_FADE_HIGH_POINT}, 1) - to loop end - (1, 0) -.
         float m = -1 / (1 - PULSE_ANIMATION_LOOP_FADE_HIGH_POINT);
         float b = m * (-PULSE_ANIMATION_LOOP_FADE_HIGH_POINT) + 1;
-        
+
         pulseFade = m * pulseMotion + b;
     }
 
@@ -678,11 +680,11 @@ static void DrawScanlineBars()
 }
 
 static void DrawContainer(ImVec2 min, ImVec2 max, bool isTextArea)
-{   
+{
     auto &res = ImGui::GetIO().DisplaySize;
     auto drawList = ImGui::GetBackgroundDrawList();
 
-    double gridAlpha = ComputeMotionInstaller(g_appearTime, g_disappearTime, 
+    double gridAlpha = ComputeMotionInstaller(g_appearTime, g_disappearTime,
         isTextArea ? CONTAINER_INNER_TIME : CONTAINER_OUTER_TIME,
         isTextArea ? CONTAINER_INNER_DURATION : CONTAINER_OUTER_DURATION
     );
@@ -699,7 +701,7 @@ static void DrawContainer(ImVec2 min, ImVec2 max, bool isTextArea)
     SetAdditive(false);
     SetShaderModifier(IMGUI_SHADER_MODIFIER_NONE);
 
-    if (isTextArea) 
+    if (isTextArea)
     {
         drawList->AddRectFilled(min, max, gridOverlayColor);
     }
@@ -835,7 +837,7 @@ static void DrawDescriptionContainer()
         ImVec2 imageRegionMin = { containerLeft, textY + descTextSize.y };
         ImVec2 imageRegionMax = { containerRight, containerBottom - (marqueeTextMax.y - marqueeTextMin.y) };
 
-        ImVec2 imageMin = 
+        ImVec2 imageMin =
         {
             /* X */ imageRegionMin.x + ((imageRegionMax.x - imageRegionMin.x) / 2) - (imageScale / 2) - (hedgeDevTextSize.x / 2) - hedgeDevTextMarginX,
             /* Y */ imageRegionMin.y + ((imageRegionMax.y - imageRegionMin.y) / 2) - (imageScale / 2) - imageMarginY
@@ -1119,7 +1121,7 @@ static void PickerThreadProcess()
     {
         result = NFD_OpenDialogMultipleN(&pathSet, nullptr, 0, nullptr);
     }
-    
+
     if (result == NFD_OKAY)
     {
         bool pathsConverted = ConvertPathSet(pathSet, g_currentPickerResults);
@@ -1246,11 +1248,11 @@ static void DrawLanguagePicker()
         float minX, maxX;
         bool buttonPressed;
 
-        for (int i = 0; i < 6; i++)
+        for (int i = 0; i < 7; i++)
         {
-            ComputeButtonColumnCoordinates((i < 3) ? ButtonColumnLeft : ButtonColumnRight, minX, maxX);
+            ComputeButtonColumnCoordinates((i < 4) ? ButtonColumnLeft : ButtonColumnRight, minX, maxX);
 
-            float minusY = (CONTAINER_BUTTON_GAP + BUTTON_HEIGHT) * (float(i % 3));
+            float minusY = (CONTAINER_BUTTON_GAP + BUTTON_HEIGHT) * (float(i % 4));
             ImVec2 min = { minX, g_aspectRatioOffsetY + Scale(CONTAINER_Y + CONTAINER_HEIGHT - CONTAINER_BUTTON_GAP - BUTTON_HEIGHT - minusY) };
             ImVec2 max = { maxX, g_aspectRatioOffsetY + Scale(CONTAINER_Y + CONTAINER_HEIGHT - CONTAINER_BUTTON_GAP - minusY) };
 
@@ -1512,7 +1514,7 @@ static void CheckCancelAction()
     {
         return;
     }
-    
+
     g_currentCursorBack = false;
 
     if (g_currentPage == WizardPage::InstallSucceeded)
@@ -1829,7 +1831,7 @@ void InstallerWizard::Shutdown()
     g_installerSources.game.reset();
     g_installerSources.update.reset();
     g_installerSources.dlc.clear();
-    
+
     // Make sure the GPU is not currently active before deleting these textures.
     Video::WaitForGPU();
 
