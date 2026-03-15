@@ -1,7 +1,7 @@
 // This file gets included in both config.h and config.cpp, with their own macros changing
 // the preprocessed output. The header is only going to have the declarations this way.
 
-CONFIG_DEFINE_ENUM_LOCALISED("System", ELanguage, Language, ELanguage::English);
+CONFIG_DEFINE_ENUM_LOCALISED("System", ELanguage, Language, ELanguage::Portuguese);
 CONFIG_DEFINE_ENUM_LOCALISED("System", EVoiceLanguage, VoiceLanguage, EVoiceLanguage::English);
 CONFIG_DEFINE_LOCALISED("System", bool, Subtitles, true);
 CONFIG_DEFINE_LOCALISED("System", bool, Hints, true);
